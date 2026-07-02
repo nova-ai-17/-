@@ -1,0 +1,21 @@
+{
+  "name": "Nova AI Chat",
+  "short_name": "Nova",
+  "description": "An AI chat interface",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#111111",
+  "theme_color": "#111111",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "75x75",
+      "type": "image/png"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "150x150",
+      "type": "image/png"
+    }
+  ]
+}
