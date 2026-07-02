@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2C2D31">
+<link rel="apple-touch-icon" href="logo.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<title>Personal AI Chat</title>
+
+<style>
+/* Your Custom Color Palette */
+:root {
+  --bg-color: #2C2D31;       /* Rich, Darker Gray Background */
+  --user-blue: #0080FF;      /* Vibrant User Blue */
+  --cyan-click: #00FFFF;     /* Pure Electric Cyan for Clicks */
+  --cyan-border: rgba(0, 255, 255, 0.25); /* Slightly transparent cyan circle */
+  --ai-bubble: #1E1F22;      /* Sleek Dark Bubble for AI */
+  --panel-bg: #1A1B1E;       /* Matching Dark Drawer Panel */
+}
+
+/* Global Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  /* System font stack leveraging Apple's San Francisco natively */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: #FFFFFF;
+  overflow: hidden;
+  letter-spacing: -0.2px; /* Emulates SF Pro clean rendering */
+}
+
+/* App Header Layout */
+header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  z-index: 10;
+}
+
+h2 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  letter-spacing: -0.1px;
+}
+
+/* Menu Toggle Button */
+.menu-toggle {
+  position: absolute;
+  left: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+.menu-toggle svg {
+  width: 26px;
+  height: 26px;
+  stroke: #FFFFFF;
+  transition: stroke 0.1s ease;
+}
+
+/* Active State: Turns Cyan on Click */
+.menu-toggle:active svg {
+  stroke: var(--cyan-click);
+}
+
+/* Left Sliding Drawer Menu */
+#sidebar {
+  position: fixed;
+  top: 0;
+  left: -280px;
+  width: 280px;
+  height: 100%;
+  background: var(--panel-bg);
+  box-shadow: 5px 0 25px rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  color: #FFFFFF;
+}
+
+body.sidebar-open #sidebar {
+  transform: translateX(280px);
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #3A3B40;
+  padding-bottom: 16px;
+}
+
+.sidebar-header h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.sidebar-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-close svg {
+  width: 24px;
+  height: 24px;
+  fill: #88888C;
+  transition: fill 0.1s ease;
+}
+
+.sidebar-close:active svg {
+  fill: var(--cyan-click);
+}
+
+.menu-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.menu-btn {
+  background: #25262B;
+  border: 1px solid #3A3B40;
+  color: #FFFFFF;
+  padding: 14px 18px;
+  border-radius: 12px;
+  text-align: left;
+  font-size: 15px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+}
+
+/* Menu Buttons turn Cyan on Click */
+.menu-btn:active {
+  background: var(--cyan-click);
+  color: #111111;
+  border-color: var(--cyan-click);
+}
+
+/* Background Dimmer Overlay */
+#overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(1px);
+  z-index: 90;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+body.sidebar-open #overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Seamless Chat Container - Bezel & Borders Completely Removed */
+#chat {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  right: 0;
+  bottom: 95px;
+  padding: 10px 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: transparent;
+}
+
+/* Completely Stealth Scrollbars */
+#chat::-webkit-scrollbar,
+#msg::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+#chat, #msg {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Conversation Chat Bubbles */
+.bubble {
+  padding: 12px 18px;
+  border-radius: 20px;
+  max-width: 78%;
+  word-wrap: break-word;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+/* AI Left Bubble */
+.ai {
+  background: var(--ai-bubble);
+  color: #FFFFFF;
+  align-self: flex-start;
+  border-top-left-radius: 4px;
+}
+
+/* User Right Bubble */
+.user {
+  background: var(--user-blue);
+  color: #FFFFFF;
+  align-self: flex-end;
+  border-top-right-radius: 4px;
+}
+
+/* Input Area Container */
+#input-container {
+  position: absolute;
+  bottom: 24px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  background: transparent;
+}
+
+/* Input Box Field - Clean Frame with Custom Global Font */
+#msg {
+  flex: 1;
+  padding: 13px 20px;
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #1E1F22;
+  color: #FFFFFF;
+  font-size: 16px;
+  font-family: inherit; /* Natively inherits San Francisco stack */
+  outline: none;
+  resize: none;
+  line-height: 1.4;
+  min-height: 48px;
+  max-height: 140px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+#msg::placeholder {
+  color: #88888C;
+}
+
+/* Modern Send Button with Custom Cyan Ring Border */
+#send-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--cyan-border); /* Slightly transparent cyan circle ring */
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: border-color 0.1s ease;
+}
+
+#send-btn svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: #FFFFFF;
+  /* Rotates the icon 45 degrees upward and centers visual weight slightly */
+  transform: rotate(-45deg) translate(1px, -1px); 
+  transition: stroke 0.1s ease;
+}
+
+/* Send Button interaction feedback: Turns solid cyan on press */
+#send-btn:active {
+  border-color: var(--cyan-click);
+}
+#send-btn:active svg {
+  stroke: var(--cyan-click);
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <button class="menu-toggle" onclick="toggleMenu()" aria-label="Open Navigation Drawer">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 6H20M4 12H20M4 18H20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  <h2>✧ AI Chat ✧</h2>
+</header>
+
+<div id="sidebar">
+  <div class="sidebar-header">
+    <h3>Preferences</h3>
+    <button class="sidebar-close" onclick="toggleMenu()" aria-label="Close Navigation Drawer">
+      <svg viewBox="0 0 24 24">
+        <path d="M6.4 19 5 17.6l5.6-5.6L5 6.4 6.4 5l5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6Z"/>
+      </svg>
+    </button>
+  </div>
+  <div class="menu-options">
+    <button class="menu-btn" onclick="alert('User Settings Profile Clicked')">User Profile</button>
+    <button class="menu-btn" onclick="alert('System App Config Clicked')">App Preferences</button>
+    <button class="menu-btn" onclick="clearChat()">Clear History</button>
+  </div>
+</div>
+
+<div id="overlay" onclick="toggleMenu()"></div>
+
+<div id="chat"></div>
+
+<div id="input-container">
+  <textarea id="msg" placeholder="Type message..." rows="1"></textarea>
+
+  <button id="send-btn" onclick="send()" aria-label="Send Message Submit Button">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M11.5003 12H5.41872M5.24634 12.7972L4.24158 15.7986C3.69128 17.4424 3.41613 18.2643 3.61353 18.7704C3.78506 19.21 4.15335 19.5432 4.6078 19.6701C5.13111 19.8161 5.92151 19.4604 7.50231 18.7491L17.5489 14.2281C19.1644 13.5011 19.9722 13.1377 20.2242 12.6274C20.444 12.1807 20.444 11.6626 20.2242 11.2159C19.9722 10.7056 19.1644 10.3422 17.5489 9.61519L7.50236 5.09422C5.92155 4.38286 5.13114 4.02718 4.60782 4.17316C4.15337 4.3001 3.78507 4.63324 3.61354 5.07287C3.41613 5.579 3.69129 6.40087 4.2416 8.04473L5.24632 11.0457C5.39424 11.4876 5.4682 11.7085 5.49753 11.9402C5.52341 12.1448 5.52342 12.3512 5.49755 12.5558C5.46821 12.7875 5.39426 13.0084 5.24634 13.5432" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+</div>
+
+<script>
+
+const chat = document.getElementById("chat");
+const msgBox = document.getElementById("msg");
+
+let thinkingInterval;
+let history = [];
+
+/* View Toggle Handling */
+function toggleMenu() {
+  document.body.classList.toggle("sidebar-open");
+}
+
+function clearChat() {
+  chat.innerHTML = "";
+  history = [];
+  toggleMenu();
+}
+
+function scrollChat() {
+  chat.scrollTo({
+    top: chat.scrollHeight,
+    behavior: "smooth"
+  });
+}
+
+function autoResize() {
+  msgBox.style.height = "auto";
+  msgBox.style.height = Math.min(msgBox.scrollHeight, 140) + "px";
+}
+
+msgBox.addEventListener("input", autoResize);
+
+/* Chat Message Actions Request Controller */
+async function send() {
+  const text = msgBox.value.trim();
+  if (!text) return;
+
+  chat.innerHTML += `<div class="bubble user"><b>You:</b> ${text}</div>`;
+  history.push({ role: "user", content: text });
+
+  msgBox.value = "";
+  autoResize();
+
+  const thinkingDiv = document.createElement("div");
+  thinkingDiv.className = "bubble ai";
+  thinkingDiv.innerHTML = "<b>AI:</b> Thinking.";
+  chat.appendChild(thinkingDiv);
+  scrollChat();
+
+  let dots = 1;
+  thinkingInterval = setInterval(() => {
+    dots = dots < 3 ? dots + 1 : 1;
+    thinkingDiv.innerHTML = `<b>AI:</b> Thinking${'.'.repeat(dots)}`;
+  }, 500);
+
+  try {
+    const res = await fetch("https://aichat.isaazizi1234.workers.dev/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages: history })
+    });
+
+    const data = await res.json();
+    clearInterval(thinkingInterval);
+    thinkingDiv.innerHTML = `<b>AI:</b> ${data.reply}`;
+
+    history.push({ role: "assistant", content: data.reply });
+    scrollChat();
+  } catch (err) {
+    clearInterval(thinkingInterval);
+    thinkingDiv.innerHTML = "<b>AI:</b> Connection error";
+    console.error(err);
+  }
+}
+
+msgBox.addEventListener("keydown", function(e) {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    send();
+  }
+});
+
+msgBox.focus();
+autoResize();
+
+</script>
+
+</body>
+  </html>
