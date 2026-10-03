@@ -35,12 +35,11 @@
 html, body {
   width: 100%;
   height: 100%;
-  /* System font stack leveraging Apple's San Francisco natively */
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background-color: var(--bg-color);
   color: #FFFFFF;
   overflow: hidden;
-  letter-spacing: -0.2px; /* Emulates SF Pro clean rendering */
+  letter-spacing: -0.2px;
 }
 
 /* App Header Layout */
@@ -84,7 +83,6 @@ h2 {
   transition: stroke 0.1s ease;
 }
 
-/* Active State: Turns Cyan on Click */
 .menu-toggle:active svg {
   stroke: var(--cyan-click);
 }
@@ -103,7 +101,7 @@ h2 {
   padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   color: #FFFFFF;
 }
 
@@ -146,28 +144,39 @@ body.sidebar-open #sidebar {
 .menu-options {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .menu-btn {
   background: #25262B;
   border: 1px solid #3A3B40;
   color: #FFFFFF;
-  padding: 14px 18px;
+  padding: 12px 16px;
   border-radius: 12px;
   text-align: left;
-  font-size: 15px;
+  font-size: 14px;
   font-family: inherit;
   font-weight: 500;
   cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   transition: background 0.1s, color 0.1s, border-color 0.1s;
 }
 
-/* Menu Buttons turn Cyan on Click */
 .menu-btn:active {
   background: var(--cyan-click);
   color: #111111;
   border-color: var(--cyan-click);
+}
+
+.logout-btn {
+  background: #3a1c1c;
+  border: 1px solid #662222;
+  color: #ff6b6b;
+  margin-top: auto;
 }
 
 /* Background Dimmer Overlay */
@@ -190,7 +199,7 @@ body.sidebar-open #overlay {
   pointer-events: auto;
 }
 
-/* Seamless Chat Container - Bezel & Borders Completely Removed */
+/* Seamless Chat Container */
 #chat {
   position: absolute;
   top: 60px;
@@ -206,7 +215,6 @@ body.sidebar-open #overlay {
   background: transparent;
 }
 
-/* Completely Stealth Scrollbars */
 #chat::-webkit-scrollbar,
 #msg::-webkit-scrollbar {
   display: none !important;
@@ -227,9 +235,9 @@ body.sidebar-open #overlay {
   word-wrap: break-word;
   font-size: 15px;
   line-height: 1.4;
+  white-space: pre-wrap;
 }
 
-/* AI Left Bubble */
 .ai {
   background: var(--ai-bubble);
   color: #FFFFFF;
@@ -237,7 +245,6 @@ body.sidebar-open #overlay {
   border-top-left-radius: 4px;
 }
 
-/* User Right Bubble */
 .user {
   background: var(--user-blue);
   color: #FFFFFF;
@@ -257,7 +264,6 @@ body.sidebar-open #overlay {
   background: transparent;
 }
 
-/* Input Box Field - Clean Frame with Custom Global Font */
 #msg {
   flex: 1;
   padding: 13px 20px;
@@ -266,7 +272,7 @@ body.sidebar-open #overlay {
   background: #1E1F22;
   color: #FFFFFF;
   font-size: 16px;
-  font-family: inherit; /* Natively inherits San Francisco stack */
+  font-family: inherit;
   outline: none;
   resize: none;
   line-height: 1.4;
@@ -280,12 +286,11 @@ body.sidebar-open #overlay {
   color: #88888C;
 }
 
-/* Modern Send Button with Custom Cyan Ring Border */
 #send-btn {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  border: 2px solid var(--cyan-border); /* Slightly transparent cyan circle ring */
+  border: 2px solid var(--cyan-border);
   background: transparent;
   display: flex;
   justify-content: center;
@@ -301,12 +306,10 @@ body.sidebar-open #overlay {
   height: 24px;
   fill: none;
   stroke: #FFFFFF;
-  /* Rotates the icon 45 degrees upward and centers visual weight slightly */
   transform: rotate(-45deg) translate(1px, -1px); 
   transition: stroke 0.1s ease;
 }
 
-/* Send Button interaction feedback: Turns solid cyan on press */
 #send-btn:active {
   border-color: var(--cyan-click);
 }
@@ -314,6 +317,70 @@ body.sidebar-open #overlay {
   stroke: var(--cyan-click);
 }
 
+/* Modal Styling */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  backdrop-filter: blur(3px);
+}
+
+.modal-content {
+  background: var(--panel-bg);
+  padding: 24px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border: 1px solid #3A3B40;
+}
+
+/* Heading turned User Blue */
+.modal-content h3 {
+  color: var(--user-blue);
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.modal-content input {
+  padding: 12px 16px;
+  background: #25262B;
+  border: 1px solid #3A3B40;
+  color: white;
+  border-radius: 10px;
+  font-size: 15px;
+  outline: none;
+}
+
+/* Submit Button turned User Blue */
+.modal-content button {
+  background: var(--user-blue);
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+/* Switch Link turned User Blue */
+#auth-toggle {
+  font-size: 13px;
+  color: var(--user-blue);
+  cursor: pointer;
+  text-align: center;
+}
+
+.hidden {
+  display: none !important;
+}
 </style>
 </head>
 
@@ -330,18 +397,16 @@ body.sidebar-open #overlay {
 
 <div id="sidebar">
   <div class="sidebar-header">
-    <h3>Preferences</h3>
+    <h3>Synced Chats</h3>
     <button class="sidebar-close" onclick="toggleMenu()" aria-label="Close Navigation Drawer">
       <svg viewBox="0 0 24 24">
         <path d="M6.4 19 5 17.6l5.6-5.6L5 6.4 6.4 5l5.6 5.6L17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6Z"/>
       </svg>
     </button>
   </div>
-  <div class="menu-options">
-    <button class="menu-btn" onclick="alert('User Settings Profile Clicked')">User Profile</button>
-    <button class="menu-btn" onclick="alert('System App Config Clicked')">App Preferences</button>
-    <button class="menu-btn" onclick="clearChat()">Clear History</button>
-  </div>
+  <button class="menu-btn" onclick="newChat()">+ New Chat</button>
+  <div class="menu-options" id="chat-list"></div>
+  <button class="menu-btn logout-btn" onclick="logout()">Log Out</button>
 </div>
 
 <div id="overlay" onclick="toggleMenu()"></div>
@@ -358,7 +423,21 @@ body.sidebar-open #overlay {
   </button>
 </div>
 
+<div id="auth-modal" class="modal">
+  <div class="modal-content">
+    <h3 id="modal-title">Sign In</h3>
+    <input type="text" id="auth-username" placeholder="Username">
+    <input type="password" id="auth-pass" placeholder="Password">
+    <button onclick="handleAuth()" id="auth-submit">Login</button>
+    <p id="auth-toggle" onclick="toggleAuthMode()">Need an account? Sign up</p>
+  </div>
+</div>
+
 <script>
+const WORKER_URL = "https://aichat.isaazizi1234.workers.dev";
+let token = localStorage.getItem("auth_token");
+let currentChatId = null;
+let isSignup = false;
 
 const chat = document.getElementById("chat");
 const msgBox = document.getElementById("msg");
@@ -366,14 +445,99 @@ const msgBox = document.getElementById("msg");
 let thinkingInterval;
 let history = [];
 
-/* View Toggle Handling */
 function toggleMenu() {
   document.body.classList.toggle("sidebar-open");
 }
 
-function clearChat() {
+function checkAuth() {
+  if (!token) {
+    document.getElementById("auth-modal").classList.remove("hidden");
+  } else {
+    document.getElementById("auth-modal").classList.add("hidden");
+    loadChatList();
+  }
+}
+
+function toggleAuthMode() {
+  isSignup = !isSignup;
+  document.getElementById("modal-title").innerText = isSignup ? "Sign Up" : "Sign In";
+  document.getElementById("auth-submit").innerText = isSignup ? "Sign Up" : "Login";
+  document.getElementById("auth-toggle").innerText = isSignup ? "Already have an account? Login" : "Need an account? Sign up";
+}
+
+async function handleAuth() {
+  const username = document.getElementById("auth-username").value.trim();
+  const password = document.getElementById("auth-pass").value;
+  const endpoint = isSignup ? "/api/signup" : "/api/login";
+
+  if (!username || !password) return alert("Enter username and password");
+
+  const res = await fetch(WORKER_URL + endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password })
+  });
+
+  const data = await res.json();
+  if (data.token) {
+    token = data.token;
+    localStorage.setItem("auth_token", token);
+    checkAuth();
+  } else {
+    alert(data.error || "Authentication failed");
+  }
+}
+
+function logout() {
+  localStorage.removeItem("auth_token");
+  token = null;
+  toggleMenu();
+  checkAuth();
+}
+
+async function loadChatList() {
+  const res = await fetch(WORKER_URL + "/api/chats", {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+  if (res.status === 401) return logout();
+
+  const chats = await res.json();
+  const list = document.getElementById("chat-list");
+  list.innerHTML = "";
+  chats.forEach(c => {
+    const btn = document.createElement("button");
+    btn.className = "menu-btn";
+    btn.innerText = c.title;
+    btn.onclick = () => loadChat(c.id);
+    list.appendChild(btn);
+  });
+}
+
+async function loadChat(chatId) {
+  currentChatId = chatId;
   chat.innerHTML = "";
   history = [];
+
+  const res = await fetch(`${WORKER_URL}/api/chats/${chatId}`, {
+    headers: { "Authorization": `Bearer ${token}` }
+  });
+  const msgs = await res.json();
+
+  msgs.forEach(m => {
+    history.push({ role: m.role, content: m.content });
+    const div = document.createElement("div");
+    div.className = `bubble ${m.role === "user" ? "user" : "ai"}`;
+    div.innerHTML = `<b>${m.role === "user" ? "You" : "AI"}:</b> ${m.content}`;
+    chat.appendChild(div);
+  });
+  scrollChat();
+  toggleMenu();
+}
+
+function newChat() {
+  currentChatId = null;
+  history = [];
+  chat.innerHTML = "";
   toggleMenu();
 }
 
@@ -391,7 +555,6 @@ function autoResize() {
 
 msgBox.addEventListener("input", autoResize);
 
-/* Chat Message Actions Request Controller */
 async function send() {
   const text = msgBox.value.trim();
   if (!text) return;
@@ -415,10 +578,16 @@ async function send() {
   }, 500);
 
   try {
-    const res = await fetch("https://aichat.isaazizi1234.workers.dev/", {
+    const res = await fetch(WORKER_URL + "/", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: history })
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        messages: history,
+        chatId: currentChatId
+      })
     });
 
     const data = await res.json();
@@ -426,6 +595,12 @@ async function send() {
     thinkingDiv.innerHTML = `<b>AI:</b> ${data.reply}`;
 
     history.push({ role: "assistant", content: data.reply });
+
+    if (!currentChatId && data.chatId) {
+      currentChatId = data.chatId;
+      loadChatList();
+    }
+
     scrollChat();
   } catch (err) {
     clearInterval(thinkingInterval);
@@ -441,10 +616,10 @@ msgBox.addEventListener("keydown", function(e) {
   }
 });
 
+checkAuth();
 msgBox.focus();
 autoResize();
-
 </script>
 
 </body>
-  </html>
+</html>
